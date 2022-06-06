@@ -2,13 +2,19 @@
 #include <LiquidCrystal.h>
 
 int numSwitches = 4;
-int Switches[] = {6, 7, 8, 9};
+int Switches[] = {8, 9, 10, 11};
 int Counts[] = {0, 0, 0, 0};
 
+int RedLED = 12;
+int GreenLED = 13;
+
+char PNames[] = {'A', 'B', 'C', 'D'};
+
 //                RS, En, D4, D5, D6, D7  R/W-Gnd
-LiquidCrystal Lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal Lcd(7, 6, 5, 4, 3, 2);
 
 void PollingAndPrint(void);
+void SetLCDCursorByIndex(int Index);
 
 void setup()
 {
@@ -19,11 +25,21 @@ void setup()
     pinMode(Switches[i], INPUT);
   }
 
-  Lcd.begin(16, 2);
+  pinMode(RedLED, OUTPUT);
+  pinMode(GreenLED, OUTPUT);
 
-  Lcd.print("hello world!");
+  digitalWrite(RedLED, LOW);
+  digitalWrite(GreenLED, LOW);
+
+  Lcd.begin(16, 2);
+  Lcd.print("Initializing");
 
   Serial.begin(9600);
+
+  delay(2000);
+
+  Lcd.setCursor(0, 0);
+  Lcd.print("               ");
 }
 
 void loop()
@@ -31,12 +47,13 @@ void loop()
   // put your main code here, to run repeatedly:
 
   PollingAndPrint();
-  delay(500);
+  delay(200);
 }
 
 void PollingAndPrint(void)
 {
-  Lcd.setCursor(0, 1);
+  Lcd.setCursor(0, 0);
+
   for (int i = 0; i < numSwitches; i++)
   {
     int reading = digitalRead(Switches[i]);
@@ -44,17 +61,37 @@ void PollingAndPrint(void)
     if (reading)
     {
       Counts[i] += 1;
-      Lcd.print(Counts[i]);
-      delay(5000);
+      SetLCDCursorByIndex(i * 8);
+      Lcd.printf("%c-%d", PNames[i], Counts[i]);
+      Serial.printf("%c-%d", PNames[i], Counts[i]);
+      digitalWrite(GreenLED, HIGH);
+      digitalWrite(RedLED, LOW);
+      delay(3000);
     }
     else
     {
-      Lcd.print(Counts[i]);
+      SetLCDCursorByIndex(i * 8);
+      Lcd.printf("%c-%d", PNames[i], Counts[i]);
+      Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
     Serial.println(Counts[i]);
-    if (!(i == (numSwitches - 1)))
-      Lcd.print(",");
   }
   Serial.println("--------------------------------------------");
   Serial.println("--------------------------------------------");
+
+  digitalWrite(GreenLED, LOW);
+  digitalWrite(RedLED, HIGH);
+}
+
+void SetLCDCursorByIndex(int Index)
+{
+  if (Index < 16)
+    Lcd.setCursor(Index, 0);
+  else if (Index < 32)
+    Lcd.setCursor(Index - 16, 1);
+  else
+  {
+    Serial.println("Error!!!\n");
+    Serial.println("Wrong Index for Setting Cursor");
+  }
 }
