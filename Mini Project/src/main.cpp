@@ -15,6 +15,7 @@ LiquidCrystal Lcd(7, 6, 5, 4, 3, 2);
 
 void PollingAndPrint(void);
 void SetLCDCursorByIndex(int Index);
+void LedFlash(int Pin);
 
 void setup()
 {
@@ -60,13 +61,30 @@ void PollingAndPrint(void)
     Serial.printf("Switch = %d, reading = %d\n", Switches[i], reading);
     if (reading)
     {
-      Counts[i] += 1;
+      digitalWrite(GreenLED, HIGH);
+      digitalWrite(RedLED, LOW);
+      for (int c = 0; c < 10; c++)
+      {
+        for (int j = 0; j < numSwitches; j++)
+        {
+          if (i == j)
+            continue;
+
+          int reading = digitalRead(Switches[j]);
+          if (reading)
+          {
+            digitalWrite(GreenLED, HIGH);
+            LedFlash(RedLED);
+            return;
+          }
+        }
+        delay(100);
+      }
       SetLCDCursorByIndex(i * 8);
       Lcd.printf("%c-%d", PNames[i], Counts[i]);
       Serial.printf("%c-%d", PNames[i], Counts[i]);
-      digitalWrite(GreenLED, HIGH);
-      digitalWrite(RedLED, LOW);
-      delay(3000);
+      delay(2000);
+      Counts[i] += 1;
     }
     else
     {
@@ -74,7 +92,6 @@ void PollingAndPrint(void)
       Lcd.printf("%c-%d", PNames[i], Counts[i]);
       Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
-    Serial.println(Counts[i]);
   }
   Serial.println("--------------------------------------------");
   Serial.println("--------------------------------------------");
@@ -93,5 +110,21 @@ void SetLCDCursorByIndex(int Index)
   {
     Serial.println("Error!!!\n");
     Serial.println("Wrong Index for Setting Cursor");
+  }
+}
+
+void LedFlash(int Pin)
+{
+  bool On = false;
+  for (int i = 0; i < 10; i++)
+  {
+    if (On)
+      digitalWrite(Pin, LOW);
+    else
+      digitalWrite(Pin, HIGH);
+
+    On = !On;
+
+    delay(100);
   }
 }

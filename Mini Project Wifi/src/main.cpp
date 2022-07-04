@@ -23,5 +23,5 @@ void loop()
   digitalWrite(pin2, LOW);
   delay(1000);
 
-  Serial.print("Doing Something\n");
+  Serial.println("Doing Something");
 }
