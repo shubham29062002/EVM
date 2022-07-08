@@ -40,7 +40,7 @@ void setup()
   delay(2000);
 
   Lcd.setCursor(0, 0);
-  Lcd.print("               ");
+  Lcd.clear();
 }
 
 void loop()
@@ -58,7 +58,7 @@ void PollingAndPrint(void)
   for (int i = 0; i < numSwitches; i++)
   {
     int reading = digitalRead(Switches[i]);
-    Serial.printf("Switch = %d, reading = %d\n", Switches[i], reading);
+    // Serial.printf("Switch = %d, reading = %d\n", Switches[i], reading);
     if (reading)
     {
       digitalWrite(GreenLED, HIGH);
@@ -80,21 +80,23 @@ void PollingAndPrint(void)
         }
         delay(100);
       }
-      SetLCDCursorByIndex(i * 8);
-      Lcd.printf("%c-%d", PNames[i], Counts[i]);
-      Serial.printf("%c-%d", PNames[i], Counts[i]);
+
       delay(2000);
       Counts[i] += 1;
+      Serial.printf("%c\n", PNames[i]);
+      SetLCDCursorByIndex(i * 8);
+      Lcd.printf("%c-%d", PNames[i], Counts[i]);
+      // Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
     else
     {
       SetLCDCursorByIndex(i * 8);
       Lcd.printf("%c-%d", PNames[i], Counts[i]);
-      Serial.printf("%c-%d", PNames[i], Counts[i]);
+      // Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
   }
-  Serial.println("--------------------------------------------");
-  Serial.println("--------------------------------------------");
+  // Serial.println("--------------------------------------------");
+  // Serial.println("--------------------------------------------");
 
   digitalWrite(GreenLED, LOW);
   digitalWrite(RedLED, HIGH);

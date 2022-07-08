@@ -1,27 +1,34 @@
 #include <Arduino.h>
-
-int pin1 = 2;
-int pin2 = 16;
+#define BUFFER_SIZE 8
 
 void setup()
 {
   // put your setup code here, to run once:
 
-  Serial.begin(115200);
-  pinMode(pin1, OUTPUT);
-  pinMode(pin2, OUTPUT);
+  Serial.begin(9600);
+  while (!Serial)
+  {
+    continue;
+  }
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
 
-  digitalWrite(pin1, HIGH);
-  digitalWrite(pin2, HIGH);
-  delay(1000);
-  digitalWrite(pin1, LOW);
-  digitalWrite(pin2, LOW);
-  delay(1000);
+  int read = Serial.available();
 
-  Serial.println("Doing Something");
+  if (read > 0)
+  {
+    // String serialData;
+    // serialData.reserve(BUFFER_SIZE);
+
+    char serialData[BUFFER_SIZE];
+    Serial.readBytes(serialData, BUFFER_SIZE);
+
+    Serial.printf("%c\n", serialData[0]);
+
+    // byte x = Serial.read();
+    // Serial.print((char *)x);
+  }
 }
