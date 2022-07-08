@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <ESP8266WiFi.h>
+
 #define BUFFER_SIZE 8
 
 void setup()
@@ -20,15 +22,9 @@ void loop()
 
   if (read > 0)
   {
-    // String serialData;
-    // serialData.reserve(BUFFER_SIZE);
-
     char serialData[BUFFER_SIZE];
     Serial.readBytes(serialData, BUFFER_SIZE);
 
-    Serial.printf("%c\n", serialData[0]);
-
-    // byte x = Serial.read();
-    // Serial.print((char *)x);
+    Serial.println(serialData[0]);
   }
 }
