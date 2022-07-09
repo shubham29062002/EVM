@@ -13,7 +13,9 @@
 const char *ssid = APSSID;
 const char *password = APPSK;
 
-ESP8266WebServer server(80);
+int port = 8888;
+
+WiFiServer server(port);
 
 void handleRoot();
 
@@ -36,42 +38,67 @@ void setup()
 
     if (WiFi.status() != WL_CONNECTED)
     {
-      Serial.println("Error Connecting to Hotspot");
+      Serial.print(".");
     }
     else
     {
       Serial.println("Connected to AP");
+
+      Serial.print("WiFi connected to ");
+      Serial.println(ssid);
+      Serial.println("IP address: ");
+      Serial.println(WiFi.localIP());
+
       connected = true;
     }
     delay(500);
   }
 
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-
-  server.on("/", handleRoot);
   server.begin();
+  Serial.print("Open Telnet and connect to IP:");
+  Serial.print(WiFi.localIP());
+  Serial.print(":");
+  Serial.println(port);
 }
 
 void loop()
 {
   // put your main code here, to run repeatedly:
 
-  int read = Serial.available();
+  // int read = Serial.available();
 
-  if (read > 0)
+  // if (read > 0)
+  // {
+  //   char serialData[BUFFER_SIZE];
+  //   Serial.readBytes(serialData, BUFFER_SIZE);
+
+  //   Serial.println(serialData[0]);
+  // }
+
+  WiFiClient client = server.available();
+
+  if (client)
   {
-    char serialData[BUFFER_SIZE];
-    Serial.readBytes(serialData, BUFFER_SIZE);
+    if (client.connected())
+    {
+      Serial.println("Client Connected");
+    }
 
-    Serial.println(serialData[0]);
+    while (client.connected())
+    {
+      while (client.available() > 0)
+      {
+        // read data from the connected client
+        Serial.write(client.read());
+      }
+
+      while (Serial.available() > 0)
+      {
+        // Send Data to connected client
+        client.write(Serial.read());
+      }
+    }
+    client.stop();
+    Serial.println("Client disconnected");
   }
-
-  server.handleClient();
-}
-
-void handleRoot()
-{
-  server.send(200, "text/html", "<h1>You are Connected</h1>");
 }
