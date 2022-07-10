@@ -15,6 +15,8 @@ const char *password = APPSK;
 
 int port = 8888;
 
+#define EVM_ID '1'
+
 WiFiServer server(port);
 
 void handleRoot();
@@ -63,18 +65,6 @@ void setup()
 
 void loop()
 {
-  // put your main code here, to run repeatedly:
-
-  // int read = Serial.available();
-
-  // if (read > 0)
-  // {
-  //   char serialData[BUFFER_SIZE];
-  //   Serial.readBytes(serialData, BUFFER_SIZE);
-
-  //   Serial.println(serialData[0]);
-  // }
-
   WiFiClient client = server.available();
 
   if (client)
@@ -82,6 +72,7 @@ void loop()
     if (client.connected())
     {
       Serial.println("Client Connected");
+      client.write(EVM_ID);
     }
 
     while (client.connected())
@@ -95,7 +86,10 @@ void loop()
       while (Serial.available() > 0)
       {
         // Send Data to connected client
-        client.write(Serial.read());
+        char party;
+        Serial.readBytes(&party, 1);
+        if (party != '\n')
+          client.write(party);
       }
     }
     client.stop();
