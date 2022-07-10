@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
+#include <EEPROM.h>
 
 int numSwitches = 4;
 int Switches[] = {8, 9, 10, 11};
@@ -36,6 +37,11 @@ void setup()
   Lcd.print("Initializing");
 
   Serial.begin(9600);
+  EEPROM.begin();
+  for (int i = 0; i < numSwitches; i++)
+  {
+    Counts[i] = EEPROM.read(i);
+  }
 
   delay(2000);
 
@@ -58,7 +64,6 @@ void PollingAndPrint(void)
   for (int i = 0; i < numSwitches; i++)
   {
     int reading = digitalRead(Switches[i]);
-    // Serial.printf("Switch = %d, reading = %d\n", Switches[i], reading);
     if (reading)
     {
       digitalWrite(GreenLED, HIGH);
@@ -86,17 +91,15 @@ void PollingAndPrint(void)
       Serial.printf("%c\n", PNames[i]);
       SetLCDCursorByIndex(i * 8);
       Lcd.printf("%c-%d", PNames[i], Counts[i]);
-      // Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
     else
     {
       SetLCDCursorByIndex(i * 8);
       Lcd.printf("%c-%d", PNames[i], Counts[i]);
-      // Serial.printf("%c-%d", PNames[i], Counts[i]);
     }
+
+    EEPROM.write(i, Counts[i]);
   }
-  // Serial.println("--------------------------------------------");
-  // Serial.println("--------------------------------------------");
 
   digitalWrite(GreenLED, LOW);
   digitalWrite(RedLED, HIGH);
