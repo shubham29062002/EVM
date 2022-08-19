@@ -45,7 +45,6 @@ void setup()
     else
     {
       Serial.println("Connected to AP");
-
       Serial.print("WiFi connected to ");
       Serial.println(ssid);
       Serial.println("IP address: ");

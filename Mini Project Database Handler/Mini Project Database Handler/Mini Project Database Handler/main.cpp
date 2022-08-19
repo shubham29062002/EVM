@@ -30,7 +30,7 @@ int main()
 {
     try
     {
-        asio::ip::tcp::endpoint endpoint(asio::ip::make_address("192.168.145.90", ec), 8888);
+        asio::ip::tcp::endpoint endpoint(asio::ip::make_address("192.168.33.90", ec), 8888);
         Socket.connect(endpoint, ec);
         
         if (!ec)
